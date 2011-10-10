@@ -4,6 +4,8 @@ class Person{
   PVector pos;
   ArrayList personalTriangles;
   HashMap trianglePoints;
+  color fillColor;
+  PVector[] points = new PVector[3];
   
   /* About the modes:
    * Because this is a tool meant for prototyping, we have to be flexible. With this system the user is able to select a mode and try it out, 
@@ -44,17 +46,24 @@ class Person{
       for(int i = 0; i < 2; i++){
         int index = ((Number)sortedArray[i]).intValue();              // get the index of the point
         Triangle tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
-        stroke(255, 0, 0);
+        stroke(0);
         if(index % 3 == 0){    // check with % if it's point A, B or C
           line(pos.x, pos.y, tri.A.x, tri.A.y);
+          points[i] = tri.A;
         }
         if(index % 3 == 1){
           line(pos.x, pos.y, tri.B.x, tri.B.y);
+          points[i] = tri.B;
         }
         if(index % 3 == 2){
           line(pos.x, pos.y, tri.C.x, tri.C.y);
+          points[i] = tri.C;
         }
       }
+      points[2] = pos;
+      fill(fillColor);
+      stroke(0);
+      triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
     }
     
 

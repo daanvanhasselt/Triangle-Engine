@@ -1,5 +1,5 @@
 class StopWatch{
-  int totalTime = 1000;
+  int totalTime = 2000;
   float fraction;
   float startTime;
   
@@ -9,7 +9,10 @@ class StopWatch{
   }
   
   float update(){  // returns normalized number
-    fraction = millis() - startTime / totalTime;
+    fraction = (millis() - startTime) / totalTime;
+
+    if(fraction > 1)
+        fraction = 1;
     return fraction;
   }
 };
