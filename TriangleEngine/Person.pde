@@ -41,33 +41,63 @@ class Person{
     trianglePoints = sortHashMap(trianglePoints);    // sort the points
     Set keyset = trianglePoints.keySet();            // get a keyset
     Object[] sortedArray = keyset.toArray();         // and convert that to an array
-  
-    // now, let's draw 2 lines to the closest points
-    // but only if they're both within the critical distance (if the second one is in range, then the first one is too)
-    float distance = ((Number)trianglePoints.get(sortedArray[1])).floatValue();
-    if(distance < criticalDistance){
-      for(int i = 0; i < 2; i++){
-        int index = ((Number)sortedArray[i]).intValue();              // get the index of the point
-        Triangle tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
+   
+   // first, get the first point
+      int i = 0;
+      int index = ((Number)sortedArray[i]).intValue();              // get the index of the point    
+      Triangle tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
+      stroke(0);
+      if(index % 3 == 0){    // check with % if it's point A, B or C
+        points[0] = tri.A;
+      }
+      if(index % 3 == 1){
+        points[0] = tri.B;
+      }
+      if(index % 3 == 2){
+        points[0] = tri.C;
+      }
+      
+      while(isThisLineIntersectingWithAnotherLine(pos.x, pos.y, points[0].x, points[0].y, triangles)){
+        index = ((Number)sortedArray[i]).intValue();              // get the index of the point    
+        tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
         stroke(0);
         if(index % 3 == 0){    // check with % if it's point A, B or C
-          line(pos.x, pos.y, tri.A.x, tri.A.y);
-          points[i] = tri.A;
+          points[0] = tri.A;
         }
         if(index % 3 == 1){
-          line(pos.x, pos.y, tri.B.x, tri.B.y);
-          points[i] = tri.B;
+          points[0] = tri.B;
         }
         if(index % 3 == 2){
-          line(pos.x, pos.y, tri.C.x, tri.C.y);
-          points[i] = tri.C;
+          points[0] = tri.C;
         }
+        i++;
+      }
+      
+      // now get the second point
+      // iterate through the sortedArray until we find a new point
+      points[1] = points[0];
+      while(points[1].x == points[0].x && points[1].y == points[0].y){
+        index = ((Number)sortedArray[i]).intValue();              // get the index of the point
+        tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
+        stroke(0);
+        if(index % 3 == 0){    // check with % if it's point A, B or C
+          points[1] = tri.A;
+        }
+        if(index % 3 == 1){
+          points[1] = tri.B;
+        }
+        if(index % 3 == 2){
+          points[1] = tri.C;
+        }
+        i++;
+      }
+      if(dist(pos.x, pos.y, points[1].x, points[1].y) > criticalDistance){
+        return;
       }
       points[2] = pos;
       fill(fillColor);
       stroke(0);
       triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
-    }
     
     
      /*--------------------------------*/
@@ -96,6 +126,10 @@ class Person{
  */ 
   }
   
+  Triangle currentTriangle(){
+    return new Triangle(points[0], points[1], points[2]);
+  }
+  
   private HashMap<Integer, Float> sortHashMap(HashMap<Integer, Float> input){
     Map<Integer, Float> tempMap = new HashMap<Integer, Float>();    // copy map
     for (int wsState : input.keySet()){
@@ -121,6 +155,43 @@ class Person{
                       (Float)sortedArray[i]);
     }
     return sortedMap;
+  }
+    
+  boolean isThisLineIntersectingWithAnotherLine(float x1, float y1, float x2, float y2, ArrayList triangles){
+    for(int i = 0; i < triangles.size(); i++) {
+      Triangle tri = (Triangle) triangles.get(i);
+      PVector intersectingWithA = segIntersection(x1, y1, x2, y2, tri.A.x, tri.A.y, tri.B.x, tri.B.y);
+      PVector intersectingWithB = segIntersection(x1, y1, x2, y2, tri.B.x, tri.B.y, tri.C.x, tri.C.y);
+      PVector intersectingWithC = segIntersection(x1, y1, x2, y2, tri.C.x, tri.C.y, tri.A.x, tri.A.y);
+      
+      if(intersectingWithA != null || intersectingWithB != null || intersectingWithC != null){
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  PVector segIntersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) 
+  { 
+    float bx = x2 - x1; 
+    float by = y2 - y1; 
+    float dx = x4 - x3; 
+    float dy = y4 - y3;
+    float b_dot_d_perp = bx * dy - by * dx;
+    if(b_dot_d_perp == 0) {
+      return null;
+    }
+    float cx = x3 - x1;
+    float cy = y3 - y1;
+    float t = (cx * dy - cy * dx) / b_dot_d_perp;
+    if(t < 0 || t > 1) {
+      return null;
+    }
+    float u = (cx * by - cy * bx) / b_dot_d_perp;
+    if(u < 0 || u > 1) { 
+      return null;
+    }
+    return new PVector(x1+t*bx, y1+t*by);
   }
   
 };
