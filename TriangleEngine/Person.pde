@@ -28,6 +28,9 @@ class Person{
   }
   
   void checkForNewTriangle(ArrayList triangles, int criticalDistance){
+     /*--------------------------------*/
+     /*------------ MODE 1 ------------*/
+     /*--------------------------------*/
     // put all the points of all the triangles into a hashmap so we can sort them, based on distance to our own position
     for(int i = 0; i < triangles.size(); i++) {
       Triangle tri = (Triangle) triangles.get(i);
@@ -66,27 +69,31 @@ class Person{
       triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
     }
     
-
-//    for(int i = 0; i < triangles.size(); i++){
-//      Triangle tri = (Triangle) triangles.get(i);
-//      float distanceToCenter = dist(pos.x, pos.y, tri.center.x, tri.center.y);
-//      if(distanceToCenter < criticalDistance){        // let's find the two closest points
-//        float distanceToA =  dist(pos.x, pos.y, tri.A.x, tri.A.y);
-//        float distanceToB = dist(pos.x, pos.y, tri.B.x, tri.B.y);
-//        float distanceToC = dist(pos.x, pos.y, tri.C.x, tri.C.y);
-//        
-//        if(distanceToA < distanceToB && distanceToA < distanceToC){
-//          line(pos.x, pos.y, tri.A.x, tri.A.y);
-//        }
-//        if(distanceToB < distanceToA && distanceToB < distanceToC){
-//          line(pos.x, pos.y, tri.B.x, tri.B.y);
-//        }
-//        if(distanceToC < distanceToA && distanceToC < distanceToB){
-//          line(pos.x, pos.y, tri.C.x, tri.C.y);
-//        }
-//      }
-//    }
     
+     /*--------------------------------*/
+     /*------------ MODE 2 ------------*/
+     /*--------------------------------*/
+/*
+    for(int i = 0; i < triangles.size(); i++){
+      Triangle tri = (Triangle) triangles.get(i);
+      float distanceToCenter = dist(pos.x, pos.y, tri.center.x, tri.center.y);
+      if(distanceToCenter < criticalDistance){        // let's find the two closest points
+        float distanceToA =  dist(pos.x, pos.y, tri.A.x, tri.A.y);
+        float distanceToB = dist(pos.x, pos.y, tri.B.x, tri.B.y);
+        float distanceToC = dist(pos.x, pos.y, tri.C.x, tri.C.y);
+        
+        if(distanceToA < distanceToB && distanceToA < distanceToC){
+          line(pos.x, pos.y, tri.A.x, tri.A.y);
+        }
+        if(distanceToB < distanceToA && distanceToB < distanceToC){
+          line(pos.x, pos.y, tri.B.x, tri.B.y);
+        }
+        if(distanceToC < distanceToA && distanceToC < distanceToB){
+          line(pos.x, pos.y, tri.C.x, tri.C.y);
+        }
+      }
+    }
+ */ 
   }
   
   private HashMap<Integer, Float> sortHashMap(HashMap<Integer, Float> input){

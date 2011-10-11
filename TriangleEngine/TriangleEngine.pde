@@ -1,9 +1,9 @@
-Triangle baseTriangle;
-ArrayList triangles;
-Person person;
-StopWatch stopWatch;
-boolean personActive = false;
-int criticalDistance = 200;
+Triangle baseTriangle;    // this triangle is always present in the center of the screen
+ArrayList triangles;      // this arraylist contains the rest of the triangles
+Person person;            // in this prototype, only one person can exist
+StopWatch stopWatch;      // this is the timer used to determine when a triangle 'freezes'
+boolean personActive = false;  // is there a person walking in our screen?
+int criticalDistance = 200;    // new triangles are only formed when a person is within this many pixels of the existing points
 
 void setup(){
   size(800, 600);
@@ -18,11 +18,14 @@ void setup(){
 void draw(){
   background(255); 
   baseTriangle.draw();
-  if(personActive){
-    person.draw();
-    person.checkForNewTriangle(triangles, criticalDistance);
-    float fraction = stopWatch.update();
-    person.fillColor = color(100, 100, 100, fraction * 255.0);
+  if(personActive){    // is someone in the room?
+    person.draw();     // if so, draw him/her
+    person.checkForNewTriangle(triangles, criticalDistance);  // check if he/she has to be connected and with which points
+    float fraction = stopWatch.update();                      // how long has he/she been standing still? (normalized value)
+    person.fillColor = color(100, 100, 100, fraction * 255.0);  // set the color according to the timer
+    if(fraction == 1){    // it's time to freeze the triangle!
+        person.freezeTriangle();
+    }
   }
 }
 
