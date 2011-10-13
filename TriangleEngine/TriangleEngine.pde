@@ -17,7 +17,6 @@ void setup(){
 
 void draw(){
   background(255); 
-//  baseTriangle.draw();
   for(int i = 0; i < triangles.size(); i++){
     Triangle tri = (Triangle)triangles.get(i);
     tri.draw();
@@ -25,11 +24,14 @@ void draw(){
   
   if(personActive){    // is someone in the room?
     person.draw();     // if so, draw him/her
-    person.checkForNewTriangle(triangles, criticalDistance);  // check if he/she has to be connected and with which points
+    person.criticalDistance = criticalDistance;
+    person.checkForNewTriangle(triangles);  // check if he/she has to be connected and with which points
     float fraction = stopWatch.update();                      // how long has he/she been standing still? (normalized value)
     person.fillColor = color(100, 100, 100, fraction * 255.0);  // set the color according to the timer
     if(fraction == 1){    // it's time to freeze the triangle!
-        triangles.add(person.currentTriangle());
+        if(person.hasTriangle){
+          triangles.add(person.currentTriangle());
+        }
         stopWatch.stop();
     }
   }

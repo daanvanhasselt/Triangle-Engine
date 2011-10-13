@@ -36,10 +36,35 @@ class Person{
       triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
       
       stroke(0);
+      float weight = ( 1.0 - (dist(points[0].x, points[0].y, points[1].x, points[1].y) / criticalDistance )) * 20.0;
+      if(weight < 0){
+        snap();
+        return;
+      }
+      strokeWeight(weight);
       line(points[0].x, points[0].y, points[1].x, points[1].y);
+      
+      weight = ( 1.0 - (dist(points[1].x, points[1].y, points[2].x, points[2].y) / criticalDistance )) * 20.0;
+      if(weight < 0){
+        snap();
+        return;
+      }
+      strokeWeight(weight);
       line(points[1].x, points[1].y, points[2].x, points[2].y);
+      
+      
+      weight = ( 1.0 - (dist(points[2].x, points[2].y, points[0].x, points[0].y) / criticalDistance )) * 20.0;
+      if(weight < 0){
+        snap();
+        return;
+      }
+      strokeWeight(weight);
       line(points[2].x, points[2].y, points[0].x, points[0].y);
     }
+  }
+  
+  void snap(){
+    hasTriangle = false;
   }
   
   void checkForNewTriangle(ArrayList triangles){
