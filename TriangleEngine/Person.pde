@@ -163,6 +163,7 @@ class Person{
       PVector intersectingWithA = segIntersection(x1, y1, x2, y2, tri.A.x, tri.A.y, tri.B.x, tri.B.y);
       PVector intersectingWithB = segIntersection(x1, y1, x2, y2, tri.B.x, tri.B.y, tri.C.x, tri.C.y);
       PVector intersectingWithC = segIntersection(x1, y1, x2, y2, tri.C.x, tri.C.y, tri.A.x, tri.A.y);
+      println("triangle " + i + ", " + intersectingWithA + ", " + intersectingWithB + ", " + intersectingWithC);
       if(intersectingWithA != null || intersectingWithB != null || intersectingWithC != null){
         return true;
       }
