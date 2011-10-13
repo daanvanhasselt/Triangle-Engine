@@ -163,7 +163,6 @@ class Person{
       PVector intersectingWithA = segIntersection(x1, y1, x2, y2, tri.A.x, tri.A.y, tri.B.x, tri.B.y);
       PVector intersectingWithB = segIntersection(x1, y1, x2, y2, tri.B.x, tri.B.y, tri.C.x, tri.C.y);
       PVector intersectingWithC = segIntersection(x1, y1, x2, y2, tri.C.x, tri.C.y, tri.A.x, tri.A.y);
-      
       if(intersectingWithA != null || intersectingWithB != null || intersectingWithC != null){
         return true;
       }
@@ -184,11 +183,11 @@ class Person{
     float cx = x3 - x1;
     float cy = y3 - y1;
     float t = (cx * dy - cy * dx) / b_dot_d_perp;
-    if(t < 0 || t > 1) {
+    if(t <= 0 || t >= 1) {
       return null;
     }
     float u = (cx * by - cy * bx) / b_dot_d_perp;
-    if(u < 0 || u > 1) { 
+    if(u <= 0 || u >= 1) { 
       return null;
     }
     return new PVector(x1+t*bx, y1+t*by);
