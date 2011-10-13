@@ -58,6 +58,15 @@ class Person{
       }
       
       while(isThisLineIntersectingWithAnotherLine(pos.x, pos.y, points[0].x, points[0].y, triangles)){
+        if(i >= sortedArray.length){
+          return;
+        }
+          
+        pushStyle();
+        strokeWeight(2);
+        stroke(255, 0, 0);
+        line(pos.x, pos.y, points[0].x, points[0].y);
+        popStyle();
         index = ((Number)sortedArray[i]).intValue();              // get the index of the point    
         tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
         stroke(0);
@@ -76,7 +85,10 @@ class Person{
       // now get the second point
       // iterate through the sortedArray until we find a new point
       points[1] = points[0];
-      while(points[1].x == points[0].x && points[1].y == points[0].y){
+      while((points[1].x == points[0].x && points[1].y == points[0].y) || isThisLineIntersectingWithAnotherLine(pos.x, pos.y, points[1].x, points[1].y, triangles)){
+        if(i >= sortedArray.length){
+          return;
+        }
         index = ((Number)sortedArray[i]).intValue();              // get the index of the point
         tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
         stroke(0);
@@ -98,6 +110,10 @@ class Person{
       fill(fillColor);
       stroke(0);
       triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
+//    stroke(255, 0, 0);
+//    line(pos.x, pos.y, points[0].x, points[0].y);
+//    stroke(0, 255, 0);
+//    line(pos.x, pos.y, points[1].x, points[1].y);      
     
     
      /*--------------------------------*/
@@ -163,7 +179,6 @@ class Person{
       PVector intersectingWithA = segIntersection(x1, y1, x2, y2, tri.A.x, tri.A.y, tri.B.x, tri.B.y);
       PVector intersectingWithB = segIntersection(x1, y1, x2, y2, tri.B.x, tri.B.y, tri.C.x, tri.C.y);
       PVector intersectingWithC = segIntersection(x1, y1, x2, y2, tri.C.x, tri.C.y, tri.A.x, tri.A.y);
-      println("triangle " + i + ", " + intersectingWithA + ", " + intersectingWithB + ", " + intersectingWithC);
       if(intersectingWithA != null || intersectingWithB != null || intersectingWithC != null){
         return true;
       }
