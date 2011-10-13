@@ -6,6 +6,8 @@ class Person{
   HashMap trianglePoints;
   color fillColor;
   PVector[] points = new PVector[3];
+  boolean hasTriangle;
+  int criticalDistance;
   
   /* About the modes:
    * Because this is a tool meant for prototyping, we have to be flexible. With this system the user is able to select a mode and try it out, 
@@ -20,14 +22,31 @@ class Person{
     personalTriangles = new ArrayList();
     trianglePoints = new HashMap();
     pos = _pos;
+    hasTriangle = false;
   }
   
   void draw(){
     fill(0);
     ellipse(pos.x, pos.y, 20, 20); 
+    if(hasTriangle){
+      points[2] = pos;
+      
+      fill(fillColor);
+      noStroke();
+      triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
+      
+      stroke(0);
+      line(points[0].x, points[0].y, points[1].x, points[1].y);
+      line(points[1].x, points[1].y, points[2].x, points[2].y);
+      line(points[2].x, points[2].y, points[0].x, points[0].y);
+    }
   }
   
-  void checkForNewTriangle(ArrayList triangles, int criticalDistance){
+  void checkForNewTriangle(ArrayList triangles){
+    if(hasTriangle){
+      return;
+    }
+    
      /*--------------------------------*/
      /*------------ MODE 1 ------------*/
      /*--------------------------------*/
@@ -103,18 +122,19 @@ class Person{
         }
         i++;
       }
-      if(dist(pos.x, pos.y, points[1].x, points[1].y) > criticalDistance){
+      if(dist(pos.x, pos.y, points[0].x, points[0].y) > criticalDistance || dist(pos.x, pos.y, points[1].x, points[1].y) > criticalDistance){
         return;
       }
       points[2] = pos;
       fill(fillColor);
-      stroke(0);
+      noStroke();
       triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
-//    stroke(255, 0, 0);
-//    line(pos.x, pos.y, points[0].x, points[0].y);
-//    stroke(0, 255, 0);
-//    line(pos.x, pos.y, points[1].x, points[1].y);      
-    
+      stroke(0);
+      line(points[0].x, points[0].y, points[1].x, points[1].y);
+      line(points[1].x, points[1].y, points[2].x, points[2].y);
+      line(points[2].x, points[2].y, points[0].x, points[0].y);
+      
+      hasTriangle = true;
     
      /*--------------------------------*/
      /*------------ MODE 2 ------------*/
