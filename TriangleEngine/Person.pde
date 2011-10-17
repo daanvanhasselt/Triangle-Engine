@@ -8,6 +8,8 @@ class Person{
   PVector[] points = new PVector[3];
   boolean hasTriangle;
   int criticalDistance;
+  StopWatch timeOut;
+  int timeToWaitBeforeNewTriangle = 500;
   
   /* About the modes:
    * Because this is a tool meant for prototyping, we have to be flexible. With this system the user is able to select a mode and try it out, 
@@ -23,6 +25,9 @@ class Person{
     trianglePoints = new HashMap();
     pos = _pos;
     hasTriangle = false;
+    timeOut = new StopWatch();
+    timeOut.totalTime = timeToWaitBeforeNewTriangle;
+    timeOut.start();
   }
   
   void draw(){
@@ -65,16 +70,28 @@ class Person{
   
   void snap(){
     hasTriangle = false;
+    timeOut.start();
   }
   
   void checkForNewTriangle(ArrayList triangles){
     if(hasTriangle){
+      checkForSnap(triangles);
       return;
     }
+    if(timeOut.update() != 1)
+      return;
     
      /*--------------------------------*/
      /*------------ MODE 1 ------------*/
      /*--------------------------------*/
+     // first, check if we're inside of a triangle
+     for(int i = 0; i < triangles.size(); i++) {
+      Triangle tri = (Triangle) triangles.get(i);
+      if(tri.isInside(round(pos.x), round(pos.y))){
+        return;
+      }
+     }
+     
     // put all the points of all the triangles into a hashmap so we can sort them, based on distance to our own position
     for(int i = 0; i < triangles.size(); i++) {
       Triangle tri = (Triangle) triangles.get(i);
@@ -86,80 +103,85 @@ class Person{
     Set keyset = trianglePoints.keySet();            // get a keyset
     Object[] sortedArray = keyset.toArray();         // and convert that to an array
    
+    PVector[] tmpPoints = new PVector[3];
+   
    // first, get the first point
       int i = 0;
       int index = ((Number)sortedArray[i]).intValue();              // get the index of the point    
       Triangle tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
       stroke(0);
       if(index % 3 == 0){    // check with % if it's point A, B or C
-        points[0] = tri.A;
+        tmpPoints[0] = tri.A;
       }
       if(index % 3 == 1){
-        points[0] = tri.B;
+        tmpPoints[0] = tri.B;
       }
       if(index % 3 == 2){
-        points[0] = tri.C;
+        tmpPoints[0] = tri.C;
       }
       
-      while(isThisLineIntersectingWithAnotherLine(pos.x, pos.y, points[0].x, points[0].y, triangles)){
+      while(isThisLineIntersectingWithAnotherLine(pos.x, pos.y, tmpPoints[0].x, tmpPoints[0].y, triangles)){        
         if(i >= sortedArray.length){
+          if(hasTriangle){
+            snap();
+          }
           return;
         }
-          
-        pushStyle();
-        strokeWeight(2);
-        stroke(255, 0, 0);
-        line(pos.x, pos.y, points[0].x, points[0].y);
-        popStyle();
+
         index = ((Number)sortedArray[i]).intValue();              // get the index of the point    
         tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
-        stroke(0);
         if(index % 3 == 0){    // check with % if it's point A, B or C
-          points[0] = tri.A;
+          tmpPoints[0] = tri.A;
         }
         if(index % 3 == 1){
-          points[0] = tri.B;
+          tmpPoints[0] = tri.B;
         }
         if(index % 3 == 2){
-          points[0] = tri.C;
+          tmpPoints[0] = tri.C;
         }
         i++;
       }
-      
+
       // now get the second point
       // iterate through the sortedArray until we find a new point
-      points[1] = points[0];
-      while((points[1].x == points[0].x && points[1].y == points[0].y) || isThisLineIntersectingWithAnotherLine(pos.x, pos.y, points[1].x, points[1].y, triangles)){
+      tmpPoints[1] = tmpPoints[0];
+      while((tmpPoints[1].x == tmpPoints[0].x && tmpPoints[1].y == tmpPoints[0].y) || isThisLineIntersectingWithAnotherLine(pos.x, pos.y, tmpPoints[1].x, tmpPoints[1].y, triangles)){
         if(i >= sortedArray.length){
+          if(hasTriangle){
+            snap();
+          }
           return;
         }
         index = ((Number)sortedArray[i]).intValue();              // get the index of the point
         tri = (Triangle) triangles.get(floor(index / 3));    // floor(index / 3) is the triangle index
         stroke(0);
         if(index % 3 == 0){    // check with % if it's point A, B or C
-          points[1] = tri.A;
+          tmpPoints[1] = tri.A;
         }
         if(index % 3 == 1){
-          points[1] = tri.B;
+          tmpPoints[1] = tri.B;
         }
         if(index % 3 == 2){
-          points[1] = tri.C;
+          tmpPoints[1] = tri.C;
         }
         i++;
       }
-      if(dist(pos.x, pos.y, points[0].x, points[0].y) > criticalDistance || dist(pos.x, pos.y, points[1].x, points[1].y) > criticalDistance){
+      if(dist(pos.x, pos.y, tmpPoints[0].x, tmpPoints[0].y) > criticalDistance || dist(pos.x, pos.y, tmpPoints[1].x, tmpPoints[1].y) > criticalDistance){
         return;
       }
-      points[2] = pos;
-      fill(fillColor);
-      noStroke();
-      triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
-      stroke(0);
-      line(points[0].x, points[0].y, points[1].x, points[1].y);
-      line(points[1].x, points[1].y, points[2].x, points[2].y);
-      line(points[2].x, points[2].y, points[0].x, points[0].y);
-      
-      hasTriangle = true;
+      tmpPoints[2] = pos;
+
+      if(!hasTriangle){
+            hasTriangle = true;
+            points = tmpPoints;
+            fill(fillColor);
+            noStroke();
+            triangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
+            stroke(0);
+            line(points[0].x, points[0].y, points[1].x, points[1].y);
+            line(points[1].x, points[1].y, points[2].x, points[2].y);
+            line(points[2].x, points[2].y, points[0].x, points[0].y);
+      }
     
      /*--------------------------------*/
      /*------------ MODE 2 ------------*/
@@ -185,6 +207,25 @@ class Person{
       }
     }
  */ 
+  }
+  
+  void checkForSnap(ArrayList triangles){
+     for(int i = 0; i < triangles.size(); i++) {
+      Triangle tri = (Triangle) triangles.get(i);
+      if(tri.isInside(round(pos.x), round(pos.y))){
+        snap();
+        return;
+      }
+     }
+     
+      if(isThisLineIntersectingWithAnotherLine(points[2].x, points[2].y, points[0].x, points[0].y, triangles)){        
+        snap();
+        return;
+      }
+      if(isThisLineIntersectingWithAnotherLine(points[2].x, points[2].y, points[1].x, points[1].y, triangles)){        
+        snap();
+        return;
+      }
   }
   
   Triangle currentTriangle(){
